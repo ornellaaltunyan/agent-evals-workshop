@@ -1,0 +1,122 @@
+[
+  {
+    "input": "Who scored the most total points this season?",
+    "expected": {
+      "values": [748],
+      "strings": ["Ja Green"]
+    },
+    "metadata": {
+      "sql_query": "SELECT p.first_name || ' ' || p.last_name AS player, SUM(pgs.points) AS total_points FROM player_game_stats pgs JOIN players p ON pgs.player_id = p.player_id GROUP BY pgs.player_id ORDER BY total_points DESC LIMIT 1"
+    }
+  },
+  {
+    "input": "Which team has the most wins this season?",
+    "expected": {
+      "values": [23],
+      "strings": ["Warriors"]
+    },
+    "metadata": {
+      "sql_query": "SELECT t.name, COUNT(*) AS wins FROM games g JOIN teams t ON ((g.home_score > g.away_score AND g.home_team_id = t.team_id) OR (g.away_score > g.home_score AND g.away_team_id = t.team_id)) GROUP BY t.team_id ORDER BY wins DESC LIMIT 1"
+    }
+  },
+  {
+    "input": "What is the average team score per game this season?",
+    "expected": {
+      "values": [115.91],
+      "strings": []
+    },
+    "metadata": {
+      "sql_query": "SELECT ROUND(AVG(points), 2) FROM team_game_stats"
+    }
+  },
+  {
+    "input": "What was the highest individual point total in a single game this season?",
+    "expected": {
+      "values": [27],
+      "strings": ["Bradley Allen"]
+    },
+    "metadata": {
+      "sql_query": "SELECT p.first_name || ' ' || p.last_name AS player, pgs.points FROM player_game_stats pgs JOIN players p ON pgs.player_id = p.player_id ORDER BY pgs.points DESC LIMIT 1"
+    }
+  },
+  {
+    "input": "How many games went to overtime this season?",
+    "expected": {
+      "values": [37],
+      "strings": []
+    },
+    "metadata": {
+      "sql_query": "SELECT COUNT(*) FROM games WHERE overtime_periods > 0"
+    }
+  },
+  {
+    "input": "Which team has the best field goal percentage this season?",
+    "expected": {
+      "values": [0.484],
+      "strings": ["Warriors"]
+    },
+    "metadata": {
+      "sql_query": "SELECT t.name, ROUND(AVG(tgs.fg_percentage), 3) AS avg_fg FROM team_game_stats tgs JOIN teams t ON tgs.team_id = t.team_id GROUP BY tgs.team_id ORDER BY avg_fg DESC LIMIT 1"
+    }
+  },
+  {
+    "input": "Which player averages the most assists per game this season (minimum 10 games played)?",
+    "expected": {
+      "values": [6.85],
+      "strings": ["Draymond Adams"]
+    },
+    "metadata": {
+      "sql_query": "SELECT p.first_name || ' ' || p.last_name AS player, ROUND(AVG(pgs.assists), 2) AS avg_ast FROM player_game_stats pgs JOIN players p ON pgs.player_id = p.player_id GROUP BY pgs.player_id HAVING COUNT(*) >= 10 ORDER BY avg_ast DESC LIMIT 1"
+    }
+  },
+  {
+    "input": "How many total games have been played in the 2024-25 season?",
+    "expected": {
+      "values": [598],
+      "strings": []
+    },
+    "metadata": {
+      "sql_query": "SELECT COUNT(*) FROM games"
+    }
+  },
+  {
+    "input": "Which conference has more wins this season?",
+    "expected": {
+      "values": [301],
+      "strings": ["Western"]
+    },
+    "metadata": {
+      "sql_query": "SELECT t.conference, COUNT(*) AS wins FROM games g JOIN teams t ON ((g.home_score > g.away_score AND g.home_team_id = t.team_id) OR (g.away_score > g.home_score AND g.away_team_id = t.team_id)) GROUP BY t.conference ORDER BY wins DESC LIMIT 1"
+    }
+  },
+  {
+    "input": "Which player averages the most rebounds per game this season (minimum 10 games played)?",
+    "expected": {
+      "values": [9.78],
+      "strings": ["James Nelson"]
+    },
+    "metadata": {
+      "sql_query": "SELECT p.first_name || ' ' || p.last_name AS player, ROUND(AVG(pgs.rebounds), 2) AS avg_reb FROM player_game_stats pgs JOIN players p ON pgs.player_id = p.player_id GROUP BY pgs.player_id HAVING COUNT(*) >= 10 ORDER BY avg_reb DESC LIMIT 1"
+    }
+  },
+  {
+    "input": "How many players are in the 2024-25 season database?",
+    "expected": {
+      "values": [450],
+      "strings": []
+    },
+    "metadata": {
+      "sql_query": "SELECT COUNT(*) FROM players"
+    }
+  },
+  {
+    "input": "Which team plays in the Northwest division of the Western conference?",
+    "expected": {
+      "values": [5],
+      "strings": ["Nuggets", "Timberwolves", "Thunder", "Trail Blazers", "Jazz"]
+    },
+    "metadata": {
+      "sql_query": "SELECT name FROM teams WHERE conference = 'Western' AND division = 'Northwest' ORDER BY name"
+    }
+  }
+]
