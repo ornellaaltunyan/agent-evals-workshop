@@ -34,7 +34,7 @@ class SupervisorAgent(BaseAgent):
         super().__init__(
             system_prompt=SUPERVISOR_SYSTEM_PROMPT,
             tools=SUPERVISOR_TOOLS,
-            model="gpt-5",
+            model="gpt-5-mini",
         )
         self._last_sql_query = None
 

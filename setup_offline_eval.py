@@ -11,7 +11,6 @@ load_dotenv()
 import braintrust
 
 from agents.supervisor_agent import SupervisorAgent
-from eval.scorers import data_eval
 from prompts.sql_prompt import SQL_SYSTEM_PROMPT
 from prompts.supervisor_prompt import SUPERVISOR_SYSTEM_PROMPT
 
@@ -111,6 +110,25 @@ def upload_code_scorer(conn, project_id, name, slug, func):
     print(f"Scorer '{name}' uploaded.")
 
 
+DATA_EVAL_PROMPT = """\
+You are evaluating whether an AI agent's response contains the correct answer to a question.
+
+Expected answer: {{expected}}
+Agent response: {{output}}
+
+Compare the numeric values and key strings in the expected answer against what appears in the agent's response.
+If all expected values are present and match, return a score of 1. If any are missing or incorrect, return 0.
+
+Return JSON with exactly this format:
+{
+    "score": 0 or 1,
+    "name": "data_eval",
+    "metadata": {
+        "rationale": "<brief explanation>"
+    }
+}
+"""
+
 SQL_EVAL_PROMPT = """\
 You are evaluating whether an AI agent's SQL query correctly answers a business question.
 
@@ -118,14 +136,13 @@ User question: {{input}}
 Reference SQL: {{metadata.sql_query}}
 Agent SQL: {{output.sql_query}}
 
-Score the agent's SQL from 0.0 to 1.0 based on how closely it matches the reference:
-- 1.0: Structurally equivalent (same tables, aggregation functions, date ranges, GROUP BY)
-- 0.5: Partially correct (some key elements match)
-- 0.0: Completely wrong, missing, or does not answer the question
+Score the agent's SQL as a 1 if it answers the user question and aligns with what is in the reference SQL. It does not need to match the reference SQL exactly; there multiple ways to arrive at the right answer. 
+
+Score the agent's SQL as a 0 if it appears to have critical mistakes (incorrect joins or where conditions, etc) that are likely to affect the result. 
 
 Return JSON with exactly this format:
 {
-    "score": <float 0-1>,
+    "score": 0 or 1,
     "name": "sql_eval",
     "metadata": {
         "rationale": "<brief explanation>"
@@ -171,16 +188,16 @@ def run():
     upload_dataset(conn)
     project_id = get_project_id(conn)
 
-    upload_prompt(conn, project_id, "sql-system-prompt", "SQL System Prompt", SQL_SYSTEM_PROMPT, model="gpt-5")
+    upload_prompt(conn, project_id, "sql-system-prompt", "SQL System Prompt", SQL_SYSTEM_PROMPT, model="gpt-5-mini")
     upload_prompt(
         conn,
         project_id,
         "supervisor-system-prompt",
         "Supervisor System Prompt",
         SUPERVISOR_SYSTEM_PROMPT,
-        model="gpt-5",
+        model="gpt-5-mini",
     )
-    upload_code_scorer(conn, project_id, "data_eval", "data_eval", data_eval)
+    upload_llm_scorer(conn, project_id, "data_eval", "data_eval", DATA_EVAL_PROMPT)
     upload_llm_scorer(conn, project_id, "sql_eval", "sql_eval", SQL_EVAL_PROMPT)
 
 

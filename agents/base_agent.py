@@ -25,7 +25,7 @@ logger = braintrust.init_logger(project="agent-evals-workshop")
 class BaseAgent:
     """Base agent with an OpenAI tool-calling loop."""
 
-    def __init__(self, system_prompt: str, tools: list, model: str = "gpt-5"):
+    def __init__(self, system_prompt: str, tools: list, model: str = "gpt-5-mini"):
         self.system_prompt = system_prompt
         self.tools = tools
         self.model = model

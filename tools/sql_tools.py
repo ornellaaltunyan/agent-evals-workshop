@@ -11,7 +11,7 @@ DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "nba.
 
 
 # @braintrust.traced(name="run_sql_query")
-def run_sql_query(query: str) -> str:
+def run_sql_query(query: str, input_message: str = "") -> str:
     """Execute a SQL query and return results as a list of dicts."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -80,9 +80,13 @@ SQL_TOOLS = [
                     "query": {
                         "type": "string",
                         "description": "The SQL query to execute.",
-                    }
+                    },
+                    "input_message": {
+                        "type": "string",
+                        "description": "The original user question this query is answering.",
+                    },
                 },
-                "required": ["query"],
+                "required": ["query", "input_message"],
             },
         },
     },

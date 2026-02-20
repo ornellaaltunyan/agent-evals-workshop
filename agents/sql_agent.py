@@ -14,14 +14,14 @@ class SQLAgent(BaseAgent):
         super().__init__(
             system_prompt=SQL_SYSTEM_PROMPT,
             tools=SQL_TOOLS,
-            model="gpt-5",
+            model="gpt-5-mini",
         )
         self._last_sql_query = None
 
     def execute_tool(self, name: str, args: dict):
         if name == "run_sql_query":
             self._last_sql_query = args["query"]
-            return run_sql_query(args["query"])
+            return run_sql_query(args["query"], args.get("input_message", ""))
         elif name == "list_tables":
             return list_tables()
         elif name == "describe_table":
