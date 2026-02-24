@@ -113,9 +113,9 @@ Results appear in the Braintrust Experiments view.
 
 ## Explore further
 
-- Make a new online scorer and configure it to run on a particular span or the [whole trace](https://www.braintrust.dev/docs/evaluate/write-scorers#score-traces)
+- Make a new online scorer in the UI and configure it to run on a particular span or the [whole trace](https://www.braintrust.dev/docs/evaluate/write-scorers#score-traces)
 - Set up remote eval so you can run evals from the UI - start with `eval/eval_sql_agent_remote.py` and follow the instructions [here](https://www.braintrust.dev/docs/evaluate/remote-evals)
-- Make changes to the SQL agent prompt (located in `prompts/`) or tool calls and run offline eval to test the changes
+- Make changes to the SQL agent prompt (`prompts/sql_prompt.py`) or tool calls (`tools/sql_tools.py`) and run offline eval to test the changes
 
 ## Project structure
 
