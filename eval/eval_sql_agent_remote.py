@@ -17,15 +17,43 @@ PROJECT = os.environ.get("BRAINTRUST_PROJECT", "agent-evals-workshop")
 # Start remote eval server using `braintrust eval eval/eval_sql_agent_remote.py --dev`
 # Go playground and select Remote Eval as task
 
+
+def extract_sql_prompt(sql_prompt_param):
+    if not sql_prompt_param:
+        return None
+
+    if hasattr(sql_prompt_param, "build"):
+        sql_prompt_param = sql_prompt_param.build()
+
+    messages = None
+    if hasattr(sql_prompt_param, "messages"):
+        messages = sql_prompt_param.messages
+    elif isinstance(sql_prompt_param, dict):
+        if isinstance(sql_prompt_param.get("messages"), list):
+            messages = sql_prompt_param["messages"]
+        elif isinstance(sql_prompt_param.get("prompt"), dict):
+            messages = sql_prompt_param["prompt"].get("messages")
+        elif isinstance(sql_prompt_param.get("default"), dict):
+            default_prompt = sql_prompt_param["default"].get("prompt")
+            if isinstance(default_prompt, dict):
+                messages = default_prompt.get("messages")
+
+    if not isinstance(messages, list):
+        return None
+
+    for message in messages:
+        if isinstance(message, dict) and message.get("role") == "system":
+            content = message.get("content")
+            if isinstance(content, str):
+                return content
+
+    return None
+
+
 async def task(input, hooks):
 
-    parameters = hooks.parameters
-    sql_prompt_param = parameters["sql_prompt"]
-    if sql_prompt_param:
-        prompt_obj = sql_prompt_param.build()
-        sql_prompt = prompt_obj.messages[0]["content"] if hasattr(prompt_obj, "messages") else None
-    else:
-        sql_prompt = None
+    parameters = hooks.parameters or {}
+    sql_prompt = extract_sql_prompt(parameters.get("sql_prompt"))
     
     agent = SQLAgent(system_prompt=sql_prompt)
     result = agent.run(input)
